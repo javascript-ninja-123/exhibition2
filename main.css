@@ -1,0 +1,53 @@
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: row;
+        }
+        
+        .button {
+            flex: 1;
+            height: 100vh;
+            color: white;
+            font-size: 3rem;
+            cursor: pointer;
+            border: none;
+            transition: all linear 0.3s;
+            transition-timing-function: cubic-bezier(.17, .67, .78, .07);
+        }
+        
+        #record {
+            background-color: pink;
+        }
+        
+        #stop {
+            background-color: green;
+        }
+        
+        #fast-forward {
+            background-color: coral;
+        }
+        
+        #delete {
+            background-color: gold;
+        }
+        
+        .button:focus {
+            outline: none;
+        }
+        
+        .button:hover {
+            transform: scale(1.4) translateY(20px);
+        }
+        
+        ui {
+            display: none;
+        }
+        
+        #uploadFile {
+            display: none;
+        }

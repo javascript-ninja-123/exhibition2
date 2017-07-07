@@ -6,16 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    <link rel="stylesheet" href="main.css">
 </head>
 
 <body>
-    <div class="container">
-        <button id='record' class='button' onclick="startRecording(this);">Record</button>
-        <button id='stop' class='button' onclick="stopRecording(this);">Stop</button>
-        <button id='fast-forward' class='button' onclick='playRecording(this)'>Play</button>
-        <button id='delete' class='button' onclick='saveitToFirebaseStorage(this)'>Local Database</button>
-    </div>
     <ul id="recordingslist"></ul>
     <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
     <script>
@@ -29,8 +22,7 @@
         };
         firebase.initializeApp(config);
     </script>
-    <script src="recorder.js"></script>
-    <script src="recording.js"></script>
+    <script src="index2.js"></script>
 </body>
 
 </html>
