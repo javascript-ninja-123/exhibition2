@@ -16,7 +16,7 @@ function stopRecording(button) {
     recorder && recorder.stop();
     button.disabled = true;
     button.previousElementSibling.disabled = false;
-    createHTML();
+    createBLOB();
     recorder.clear();
 }
 
@@ -27,60 +27,31 @@ function playRecording(button) {
 
 
 
-function saveitToDatabase(button) {
-    let item = document.querySelector('#recordingslist');
-    let firebaseRef = firebase.database().ref();
-    let data = {
-        name: 'sound',
-        src: item.firstChild.querySelector('.audio').getAttribute('src')
-    }
-    firebaseRef.push(data);
-    fetchDataformFireBase();
-}
-
-function saveitToFirebaseStorage(button) {
-    recorder && recorder.exportWAV(function(blob) {
+function createBLOB() {
+    recorder && recorder.exportWAV(blob => {
+        //create a blob and push it to the Firebase
         var d = new Date();
         var n = d.toISOString();
         var file = new File([blob], `${n}.wav`, {
             lastModified: new Date(0),
             type: "overide/mimetype"
         });
-
         let storageRef = firebase.storage().ref('/sound/' + file.name);
-        storageRef.put(file);
-    });
-    saveitToDatabase();
-}
-
-
-
-function fetchDataformFireBase() {
-    let ref = firebase.database().ref();
-    ref.on('value', data => {
-        let newSound = data.val();
-        let keys = Object.keys(newSound);
-        //   console.log(`src is ${newSound.src}`);
-        var result = keys.filter(value => {
-            return (value === keys[keys.length - 1])
+        document.querySelector('#local').addEventListener('click', function() {
+            storageRef.put(file);
+            saveitToDatabase();
         })
-        for (var sound in newSound) {
-            if (sound == result) {
-                console.log(`The most recent sound src is ${newSound[sound].src}`);
-            }
-        }
-    })
-}
 
-function createHTML() {
-    recorder && recorder.exportWAV(function(blob) {
+        //create a li tag
         var url = URL.createObjectURL(blob);
+        let newArray = Array.from(recordingslist.children);
+        if (newArray.length > 0) {
+            recordingslist.removeChild(recordingslist.firstChild)
+        }
         let li = `<li><audio controls src='${url}' class='audio'></audio></li>`;
         recordingslist.insertAdjacentHTML('afterbegin', li)
     });
 }
-
-
 
 window.onload = function init() {
     try {
@@ -99,3 +70,35 @@ window.onload = function init() {
 
     });
 };
+
+
+
+//save it to database
+// function saveitToDatabase(button) {
+//     let item = document.querySelector('#recordingslist');
+//     let firebaseRef = firebase.database().ref();
+//     let data = {
+//         name: 'sound',
+//         src: item.firstChild.querySelector('.audio').getAttribute('src')
+//     }
+//     firebaseRef.push(data);
+//     fetchDataformFireBase();
+// }
+
+
+// function fetchDataformFireBase() {
+//     let ref = firebase.database().ref();
+//     ref.on('value', data => {
+//         let newSound = data.val();
+//         let keys = Object.keys(newSound);
+//         //   console.log(`src is ${newSound.src}`);
+//         var result = keys.filter(value => {
+//             return (value === keys[keys.length - 1])
+//         })
+//         for (var sound in newSound) {
+//             if (sound == result) {
+//                 console.log(`The most recent sound src is ${newSound[sound].src}`);
+//             }
+//         }
+//     })
+// }
