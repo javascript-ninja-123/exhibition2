@@ -26,20 +26,38 @@ function playRecording(button) {
 }
 
 
+function saveitToDatabase(n) {
+    let firebaseRef = firebase.database().ref();
+    let data = {
+        name: `${n}`
+    }
+    firebaseRef.push(data);
+}
+
+let newArray = [];
 
 function createBLOB() {
     recorder && recorder.exportWAV(blob => {
         //create a blob and push it to the Firebase
         var d = new Date();
-        var n = d.toISOString();
-        var file = new File([blob], `${n}.wav`, {
+        var year = d.getFullYear();
+        var month = d.getMonth();
+        var day = d.getDate();
+        var hour = d.getHours();
+        var min = d.getMinutes();
+        var sec = d.getSeconds();
+        var time = `${year}-${month}-${day}-${hour}h-${min}m-${sec}sec`;
+        var file = new File([blob], `${time}.wav`, {
             lastModified: new Date(0),
             type: "overide/mimetype"
         });
+
         let storageRef = firebase.storage().ref('/sound/' + file.name);
+        //push it to the firebase
         document.querySelector('#local').addEventListener('click', function() {
             storageRef.put(file);
-            saveitToDatabase();
+            saveitToDatabase(`${time}.wav`);
+            newArray.unshift(time);
         })
 
         //create a li tag
@@ -49,9 +67,13 @@ function createBLOB() {
             recordingslist.removeChild(recordingslist.firstChild)
         }
         let li = `<li><audio controls src='${url}' class='audio'></audio></li>`;
-        recordingslist.insertAdjacentHTML('afterbegin', li)
+        recordingslist.insertAdjacentHTML('afterbegin', li);
+
     });
 }
+
+
+
 
 window.onload = function init() {
     try {
@@ -70,35 +92,3 @@ window.onload = function init() {
 
     });
 };
-
-
-
-//save it to database
-// function saveitToDatabase(button) {
-//     let item = document.querySelector('#recordingslist');
-//     let firebaseRef = firebase.database().ref();
-//     let data = {
-//         name: 'sound',
-//         src: item.firstChild.querySelector('.audio').getAttribute('src')
-//     }
-//     firebaseRef.push(data);
-//     fetchDataformFireBase();
-// }
-
-
-// function fetchDataformFireBase() {
-//     let ref = firebase.database().ref();
-//     ref.on('value', data => {
-//         let newSound = data.val();
-//         let keys = Object.keys(newSound);
-//         //   console.log(`src is ${newSound.src}`);
-//         var result = keys.filter(value => {
-//             return (value === keys[keys.length - 1])
-//         })
-//         for (var sound in newSound) {
-//             if (sound == result) {
-//                 console.log(`The most recent sound src is ${newSound[sound].src}`);
-//             }
-//         }
-//     })
-// }
