@@ -1,43 +1,15 @@
-var audio_context;
-var recorder;
-
-function startUserMedia(stream) {
-    var input = audio_context.createMediaStreamSource(stream);
-    recorder = new Recorder(input);
-}
-
-function startRecording(button) {
-    recorder && recorder.record();
-    button.disabled = true;
-    button.nextElementSibling.disabled = false;
-}
-
-function stopRecording(button) {
-    recorder && recorder.stop();
-    button.disabled = true;
-    button.previousElementSibling.disabled = false;
-    createBLOB();
-    recorder.clear();
-}
-
-function playRecording(button) {
-    let item = document.querySelector('#recordingslist');
-    item.firstChild.querySelector('.audio').play();
-}
-
-
-function saveitToDatabase(n) {
-    let firebaseRef = firebase.database().ref();
-    let data = {
-        name: `${n}`
-    }
-    firebaseRef.push(data);
-}
+var mediaConstraints = {
+    audio: true
+};
 
 let newArray = [];
+var mediaRecorder;
+navigator.getUserMedia(mediaConstraints, onMediaSuccess, onMediaError);
 
-function createBLOB() {
-    recorder && recorder.exportWAV(blob => {
+function onMediaSuccess(stream) {
+    mediaRecorder = new MediaStreamRecorder(stream);
+    mediaRecorder.mimeType = 'audio/wav';
+    mediaRecorder.ondataavailable = function(blob) {
         //create a blob and push it to the Firebase
         var d = new Date();
         var year = d.getFullYear();
@@ -68,27 +40,34 @@ function createBLOB() {
         }
         let li = `<li><audio controls src='${url}' class='audio'></audio></li>`;
         recordingslist.insertAdjacentHTML('afterbegin', li);
+    };
 
-    });
+}
+
+function onMediaError(e) {
+    console.error('media error', e);
 }
 
 
 
+function startRecording(button) {
+    mediaRecorder.start();
+}
 
-window.onload = function init() {
-    try {
-        // webkit shim
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
-        window.URL = window.URL || window.webkitURL;
+function stopRecording(button) {
+    mediaRecorder.pause();
+}
 
-        audio_context = new AudioContext;
+function playRecording(button) {
+    let item = document.querySelector('#recordingslist');
+    item.firstChild.querySelector('.audio').play();
+}
 
-    } catch (e) {
-        alert('No web audio support in this browser!');
+
+function saveitToDatabase(n) {
+    let firebaseRef = firebase.database().ref();
+    let data = {
+        name: `${n}`
     }
-
-    navigator.getUserMedia({ audio: true }, startUserMedia, function(e) {
-
-    });
-};
+    firebaseRef.push(data);
+}

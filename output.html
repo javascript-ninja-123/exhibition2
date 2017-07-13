@@ -24,18 +24,18 @@
     </script>
     <script>
         var storageDatabase = firebase.database().ref();
-        storageDatabase.on('value', data => {
+        storageDatabase.once('value', data => {
                 const tokenArray = [];
                 let soundTrack = data.val();
                 let lastSoundTrack = Object.keys(soundTrack).slice(-1);
-                for (x in soundTrack) {
-                    if (x == lastSoundTrack) {
-                        let y = soundTrack[x].name;
-                        tokenArray.unshift(y);
+                Object.keys(soundTrack).filter(value => {
+                    if (value == lastSoundTrack) {
+                        let newresult = soundTrack[value].name;
+                        tokenArray.unshift(newresult);
                         localStorage.clear();
                         localStorage.setItem('array', tokenArray);
                     }
-                }
+                })
             })
             //retrieve it from firebase
         let newArray = localStorage.getItem('array');
