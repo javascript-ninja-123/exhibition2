@@ -23,6 +23,7 @@
         firebase.initializeApp(config);
     </script>
     <script>
+        var storage = firebase.storage();
         var storageDatabase = firebase.database().ref();
         storageDatabase.once('value', data => {
                 const tokenArray = [];
@@ -41,7 +42,7 @@
         let newArray = localStorage.getItem('array');
         console.log(localStorage)
         console.log(newArray)
-        var storage = firebase.storage();
+
         storage.ref().child(`sound/${newArray}`).getDownloadURL().then(function(url) {
             let li = `<li><audio controls class='audio'>
                             <source src="${url}" type="audio/wav">
