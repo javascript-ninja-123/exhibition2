@@ -1,23 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-us">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-    <link rel="stylesheet" href="main.css">
-
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Web dictaphone</title>
+    <link href="styles/app.css" rel="stylesheet" type="text/css">
+    <link href="styles/install-button.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-    <div class="container">
-        <button id='record' class='button' onclick="startRecording(this);">Record</button>
-        <button id='stop' class='button' onclick="stopRecording(this);">Stop</button>
-        <button id='fast-forward' class='button' onclick='playRecording(this)'>Play</button>
-        <button id='local' class='button'>Save</button>
+
+    <div class="wrapper">
+
+        <header>
+            <h1>Web dictaphone</h1>
+        </header>
+
+        <section class="main-controls">
+            <canvas class="visualizer"></canvas>
+            <div id="buttons">
+                <button class="record">Record</button>
+                <button class="stop">Stop</button>
+                <button class="play">Play</button>
+                <button class="save">Save</button>
+            </div>
+        </section>
+
+        <section class="sound-clips">
+
+
+        </section>
+
     </div>
-    <ul id="recordingslist"></ul>
+
+
     <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
     <script>
         var config = {
@@ -30,10 +47,11 @@
         };
         firebase.initializeApp(config);
     </script>
-    <!-- <script src="recorder.js"></script> -->
-    <script src="https://cdn.webrtc-experiment.com/MediaStreamRecorder.js">
-    </script>
-    <script src="recording.js"></script>
+    <script src="scripts/install.js"></script>
+
+    <!-- Below is your custom application script -->
+    <script src="scripts/app.js"></script>
+
 </body>
 
 </html>
