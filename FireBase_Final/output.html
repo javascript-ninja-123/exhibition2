@@ -76,11 +76,13 @@
         });
 
         var storageDatabase = firebase.database().ref();
+        var soundRef = storageDatabase.child('sound')
+        var songRef = soundRef.child('songs')
+        var switchRef = soundRef.child('switch');
         var storage = firebase.storage();
 
         function spitFire(number) {
-            var storageDatabase = firebase.database().ref();
-            storageDatabase.once('value')
+            soundRef.once('value')
                 .then(data => {
                     let newArray = [];
                     data.forEach((value, index) => {
