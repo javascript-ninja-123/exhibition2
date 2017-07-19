@@ -54,6 +54,7 @@ body {
 #playWrapper,
 #saveWrapper {
     opacity: 0;
+    display: none;
 }
 
 @-moz-keyframes spin {

@@ -74,6 +74,7 @@ if (navigator.getUserMedia) {
                 .to(stopWrapper, 1, { opacity: 1 })
             stop.disabled = false;
             record.disabled = true;
+            stopWrapper.style.display = 'block'
 
         }
 
@@ -85,14 +86,17 @@ if (navigator.getUserMedia) {
                 .to(playWrapper, 1, { opacity: 1 })
             stop.disabled = true;
             record.disabled = false;
+            playWrapper.style.display = 'block'
         }
 
         play.onclick = () => {
             soundClips.firstChild.play();
+            saveWrapper.style.display = 'block'
             addSpin(play)
             tl
                 .to(playWrapper, 2, { x: 300, autoAlpha: 0, ease: Power1.easeOut })
                 .to(saveWrapper, 1, { opacity: 1 })
+
 
         }
 
