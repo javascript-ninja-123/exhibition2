@@ -78,37 +78,44 @@
         var storageDatabase = firebase.database().ref();
         var soundRef = storageDatabase.child('sound')
         var songRef = soundRef.child('songs')
+        var temRef = soundRef.child('temporary')
 
         function spitFire() {
             songRef.on('value', snap => {
-                array = [];
+                let snapshot = snap.val();
+                let key = snap.key;
+                let array = [];
                 snap.forEach(value => {
-                    let blob = value.val().blob;
-                    array.push(blob)
+                    array.push(value.val())
                 })
-                localStorage.setItem('newArray', JSON.stringify(array))
+                Promise.all(array)
+                    .then(data => {
+                        return lastEle = data.slice(-1)[0].blob;
+                    })
+                    .then(data => {
+                        createLi(data)
+                        document.querySelector('ul').firstChild.firstChild.pause();
+                        document.querySelector('ul').firstChild.firstChild.play();
+
+                        return document.querySelector('ul').firstChild.firstChild;
+                    })
+                    .then(data => {
+                        data.addEventListener('ended', () => {
+
+                        })
+                    })
+                    .catch(err => {
+                        console.warn(err + 'happened')
+                    })
             })
         }
-        songRef.limitToLast(1).on('child_added', snap => {
-            let snapshot = snap.val();
+
+        function createLi(blob) {
             let li = `<li><audio controls class='audio'>
-                            <source src="${snapshot.blob}" type="audio/wav">
+                            <source src="${blob}" type="audio/wav">
                                 </audio></li>`
-            document.querySelector('ul').insertAdjacentHTML('afterbegin', li)
-            document.querySelector('ul').firstChild.firstChild.play();
-            document.querySelector('ul').firstChild.firstChild.addEventListener('ended', () => {
-                let newArray = localStorage.getItem('newArray');
-                let realArray = JSON.parse(newArray)
-                let value = realArray[realArray.length - 2];
-                let li = `<li><audio controls class='audio'>
-                            <source src="${value}" type="audio/wav">
-                                </audio></li>`
-                document.querySelector('ul').insertAdjacentHTML('afterbegin', li)
-                setTimeout(() => {
-                    document.querySelector('ul').firstChild.firstChild.play();
-                }, 1500)
-            })
-        })
+            document.querySelector('ul').insertAdjacentHTML('afterbegin', li);
+        }
     </script>
 </body>
 

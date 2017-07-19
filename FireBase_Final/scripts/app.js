@@ -8,14 +8,16 @@ navigator.getUserMedia = (navigator.getUserMedia ||
 
 // set up basic variables for app
 
-const record = document.querySelector('.record');
-const stop = document.querySelector('.stop');
-const play = document.querySelector('.play');
-const save = document.querySelector('.save');
+const record = document.getElementById('record');
+const stop = document.getElementById('stop');
+const play = document.getElementById('play');
+const save = document.getElementById('save');
 const soundClips = document.querySelector('.sound-clips');
 var file;
 var time;
 var storageRef;
+var blob;
+var url;
 
 // disable stop button while not recording
 
@@ -23,10 +25,34 @@ stop.disabled = true;
 play.disabled = true;
 
 
+
 // visualiser setup - create web audio api context and canvas
 
 var audioCtx = new(window.AudioContext || webkitAudioContext)();
 
+
+// DOM animation
+const recordWrapper = document.getElementById('recordWrapper')
+const stopWrapper = document.getElementById('stopWrapper')
+const playWrapper = document.getElementById('playWrapper')
+const saveWrapper = document.getElementById('saveWrapper')
+var tl = new TimelineLite();
+
+function addSpin(ele) {
+    ele.style.animationName = 'spin';
+    ele.style.animationDuration = 3000 + 'ms';
+    ele.style.animationIterationCount = 'infinite'
+}
+
+
+
+//Firebase check
+let switchFB = firebase.database().ref().child('sound').child('switch');
+switchFB.update({
+    switch: false
+})
+
+let temporaryFB = firebase.database().ref().child('sound').child('temporary')
 
 //main block for doing the audio recording
 
@@ -41,15 +67,11 @@ if (navigator.getUserMedia) {
 
 
         record.onclick = function() {
-            record.style.animationName = 'spin';
-            record.style.animationDuration = 3000 + 's';
-            record.style.animationIterationCount = 'infinite'
-            record.style.WebkitAnimationIterationCount = 'infinite'
-            record.style.WebkitAnimationIterationCount = 'infinite'
-            record.style.WebkitAnimationName = 'spin';
             mediaRecorder.start();
-
-
+            addSpin(record)
+            tl
+                .to(recordWrapper, 2, { x: 200, autoAlpha: 0, ease: Power1.easeOut })
+                .to(stopWrapper, 1, { opacity: 1 })
             stop.disabled = false;
             record.disabled = true;
 
@@ -57,13 +79,20 @@ if (navigator.getUserMedia) {
 
         stop.onclick = function() {
             mediaRecorder.stop();
-
+            addSpin(stop)
+            tl
+                .to(stopWrapper, 2, { x: 300, autoAlpha: 0, ease: Power1.easeOut })
+                .to(playWrapper, 1, { opacity: 1 })
             stop.disabled = true;
             record.disabled = false;
         }
 
         play.onclick = () => {
             soundClips.firstChild.play();
+            addSpin(play)
+            tl
+                .to(playWrapper, 2, { x: 300, autoAlpha: 0, ease: Power1.easeOut })
+                .to(saveWrapper, 1, { opacity: 1 })
 
         }
 
@@ -94,23 +123,34 @@ if (navigator.getUserMedia) {
                 var min = d.getMinutes();
                 var sec = d.getSeconds();
                 time = `${year}-${month}-${day}-${hour}h-${min}m-${sec}sec`;
-                file = new File([e.data], `${time}.wav`, {
+                blob = e.data;
+                url = URL.createObjectURL(blob);
+
+                file = new File([blob], `${time}.wav`, {
                     lastModified: new Date(0),
                     type: "overide/mimetype"
                 });
+                console.log(file)
                 storageRef = firebase.storage().ref('/sound/' + file.name);
             }
             //push it to the firebase
         save.onclick = () => {
-            storageRef.put(file);
-            saveitToDatabase(`${time}.wav`);
+            saveitToDatabase(time, url, 'sound/songs')
+            addSpin(save)
+            tl
+                .to(saveWrapper, 2, { x: 300, autoAlpha: 0, ease: Power1.easeOut })
+            setTimeout(() => {
+                location.reload();
+            }, 3000)
         }
 
 
-        function saveitToDatabase(n) {
-            let firebaseRef = firebase.database().ref();
+        function saveitToDatabase(n, b, place) {
+            let firebaseRef = firebase.database().ref(place);
             let data = {
-                name: `${n}`
+                time: `${n}`,
+                blob: `${b}`,
+                used: false
             }
             firebaseRef.push(data);
         }
