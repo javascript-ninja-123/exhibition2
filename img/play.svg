@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="566px" height="587px" viewBox="0 0 566 587" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 45 (43475) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 2</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-2" transform="translate(-12.000000, 0.000000)">
+            <g id="Group">
+                <polygon id="Shape" fill="#4A90E2" fill-rule="nonzero" transform="translate(357.478000, 336.655616) rotate(345.000000) translate(-357.478000, -336.655616) " points="655.648 68.6656163 59.3080002 107.745616 391.318 604.645616"></polygon>
+                <text id="Play" font-family="Roboto-Regular, Roboto" font-size="70" font-weight="normal" fill="#FFFFFF">
+                    <tspan x="289" y="318">Play</tspan>
+                </text>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .container {
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <video id="video"></video>
+        <canvas id="motion"></canvas>
+        <span>
+	`Score: <span id="score">?</span>
+        </span>
+
+    </div>
+    <ul id="recordingslist2"></ul>
+    <script src="camLibrary.js"></script>
+    <!--motion detection javascript functionlities  -->
+    <script>
+    </script>
+    <!--firebase retrieving javascript functionalities   -->
+    <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
+    <script>
+        //fire firebase
+        var config = {
+            apiKey: "AIzaSyD-hYIApkFby9GRHEe6RVQ8gs-YKZylY44",
+            authDomain: "glenda-174ee.firebaseapp.com",
+            databaseURL: "https://glenda-174ee.firebaseio.com",
+            projectId: "glenda-174ee",
+            storageBucket: "glenda-174ee.appspot.com",
+            messagingSenderId: "1035646158453"
+        };
+        firebase.initializeApp(config);
+
+        //motion detection DOM
+        let video = document.getElementById('video');
+        let canvas = document.getElementById('motion');
+        let score = document.getElementById('score');
+        const audio = document.querySelector('audio');
+
+        localStorage.setItem('number', 1)
+        var item = localStorage.getItem('number');
+
+
+        function initSuccess() {
+            DiffCamEngine.start();
+        }
+
+        function initError() {
+            alert('Something went wrong.');
+        }
+
+        function capture(payload) {
+            score.textContent = payload.score;
+            if (payload.score > 200) {
+                spitFire();
+                DiffCamEngine.stop();
+            }
+        }
+
+        DiffCamEngine.init({
+            video: video,
+            motionCanvas: canvas,
+            initSuccessCallback: initSuccess,
+            initErrorCallback: initError,
+            captureCallback: capture
+        });
+
+        var storageDatabase = firebase.database().ref();
+        var soundRef = storageDatabase.child('sound')
+        var songRef = soundRef.child('songs')
+
+        function spitFire() {
+            songRef.on('value', snap => {
+                array = [];
+                snap.forEach(value => {
+                    let blob = value.val().blob;
+                    array.push(blob)
+                })
+                localStorage.setItem('newArray', JSON.stringify(array))
+            })
+        }
+        songRef.limitToLast(1).on('child_added', snap => {
+            let snapshot = snap.val();
+            let li = `<li><audio controls class='audio'>
+                            <source src="${snapshot.blob}" type="audio/wav">
+                                </audio></li>`
+            document.querySelector('ul').insertAdjacentHTML('afterbegin', li)
+            document.querySelector('ul').firstChild.firstChild.play();
+            document.querySelector('ul').firstChild.firstChild.addEventListener('ended', () => {
+                let newArray = localStorage.getItem('newArray');
+                let realArray = JSON.parse(newArray)
+                let value = realArray[realArray.length - 2];
+                let li = `<li><audio controls class='audio'>
+                            <source src="${value}" type="audio/wav">
+                                </audio></li>`
+                document.querySelector('ul').insertAdjacentHTML('afterbegin', li)
+                setTimeout(() => {
+                    document.querySelector('ul').firstChild.firstChild.play();
+                }, 1500)
+            })
+        })
+    </script>
+</body>
+
+</html>
