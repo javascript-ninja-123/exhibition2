@@ -31,7 +31,6 @@ const stopWrapper = document.getElementById('stopWrapper')
 const playWrapper = document.getElementById('playWrapper')
 const saveWrapper = document.getElementById('saveWrapper')
 var tl = new TimelineLite();
-
 let addSpin = (ele) => {
     ele.style.animationName = 'spin';
     ele.style.animationDuration = 3000 + 'ms';
@@ -55,8 +54,11 @@ if (navigator.getUserMedia) {
     var chunks = [];
     var onSuccess = function(stream) {
         var mediaRecorder = new MediaRecorder(stream);
+
+        // Click a record button
         record.onclick = function() {
             mediaRecorder.start();
+            //animation 
             addSpin(record)
             tl
                 .to(recordWrapper, 2, { x: 200, autoAlpha: 0, ease: Power1.easeOut })
@@ -64,23 +66,13 @@ if (navigator.getUserMedia) {
             stop.disabled = false;
             record.disabled = true;
             stopWrapper.style.display = 'block'
-
-            if (localStorage.length >= 1) {
-                let data = localStorage.getItem('data');
-                let newData = JSON.parse(data)
-                switchRef.limitToFirst(1).on('child_added', snap => {
-                    let snapshot = snap.val();
-                    if (snapshot.switch === false) {
-                        songRef.push(newData)
-                        console.log('we pushed')
-                    }
-                })
-
-            }
         }
 
+
+        // Click a stop button
         stop.onclick = function() {
             mediaRecorder.stop();
+            // animation 
             addSpin(stop)
             tl
                 .to(stopWrapper, 2, { x: 300, autoAlpha: 0, ease: Power1.easeOut })
@@ -90,6 +82,7 @@ if (navigator.getUserMedia) {
             playWrapper.style.display = 'block'
         }
 
+        //  Click a play button
         play.onclick = () => {
             soundClips.firstChild.play();
             saveWrapper.style.display = 'block'
@@ -101,7 +94,9 @@ if (navigator.getUserMedia) {
 
         }
 
+        // right after stop button is clicked
         mediaRecorder.onstop = function(e) {
+
             let soundClipArray = Array.from(soundClips.children);
             if (soundClipArray.length > 0) {
                 let firstChildEle = soundClips.firstChild;
@@ -120,6 +115,7 @@ if (navigator.getUserMedia) {
 
         mediaRecorder.ondataavailable = function(e) {
                 chunks.push(e.data);
+                // new time Date();
                 var d = new Date();
                 var year = d.getFullYear();
                 var month = d.getMonth();
@@ -130,7 +126,7 @@ if (navigator.getUserMedia) {
                 time = `${year}-${month}-${day}-${hour}h-${min}m-${sec}sec`;
                 blob = e.data;
                 url = URL.createObjectURL(blob);
-
+                // create a file
                 file = new File([blob], `${time}.wav`, {
                     lastModified: new Date(0),
                     type: "overide/mimetype"
@@ -138,7 +134,7 @@ if (navigator.getUserMedia) {
                 console.log(file)
                 storageRef = firebase.storage().ref('/sound/' + file.name);
             }
-            //push it to the firebase
+            //Click a save button
         save.onclick = () => {
             saveitToDatabase(time, url, 'sound/songs')
             addSpin(save)
@@ -149,18 +145,8 @@ if (navigator.getUserMedia) {
             }, 3000)
         }
 
-
+        //push data to firebase
         function saveitToDatabase(n, b, place) {
-            // switchRef.limitToFirst(1).on('child_added', snap => {
-            //     let snapshot = snap.val();
-            //     if (snapshot.switch === true) {
-            //         let data = {
-            //             time: `${n}`,
-            //             blob: `${b}`,
-            //         }
-            //         localStorage.setItem('data', JSON.stringify(data))
-            //     }
-            // })
             let firebaseRef = firebase.database().ref(place);
             let data = {
                 time: `${n}`,
