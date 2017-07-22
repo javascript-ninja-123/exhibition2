@@ -61,7 +61,7 @@
             score.textContent = payload.score;
             if (payload.score > 200) {
                 // trigger firebase 
-                spitFire();
+
                 DiffCamEngine.stop();
             }
         }
@@ -86,63 +86,63 @@
         })
 
 
-        function spitFire() {
-            // firebase on,loop function, to retrieve data everytime new data is pushed to the realtime database
-            songRef.on('value', snap => {
-                let snapshot = snap.val();
-                let key = snap.key;
-                let array = [];
-                //loop it and clone every data to my own array
-                snap.forEach(value => {
-                        array.push(value.val())
-                    })
-                    //using promise
-                Promise.all(array)
-                    .then(data => {
-                        //getting the most recent data 
-                        return lastEle = data.slice(-1)[0].blob;
-                    })
-                    .then(data => {
-                        createLi(data)
-                        const playPromise = document.querySelector('ul').firstChild.firstChild.play();
-                        if (playPromise !== undefined) {
-                            playPromise.then(() => {
-                                    document.querySelector('ul').firstChild.firstChild.pause();
-                                })
-                                .catch(error => {
 
-                                });
-                        }
-                        //if switch is true, an exsisting story is playing
-                        document.querySelector('ul').firstChild.firstChild.addEventListener('playing', () => {
-                            switchRef.child(key2).remove();
-                            switchRef.push({
-                                switch: true
+        // firebase on,loop function, to retrieve data everytime new data is pushed to the realtime database
+        songRef.on('value', snap => {
+            let snapshot = snap.val();
+            let key = snap.key;
+            let array = [];
+            //loop it and clone every data to my own array
+            snap.forEach(value => {
+                    array.push(value.val())
+                })
+                //using promise
+            Promise.all(array)
+                .then(data => {
+                    //getting the most recent data 
+                    return lastEle = data.slice(-1)[0].blob;
+                })
+                .then(data => {
+                    createLi(data)
+                    const playPromise = document.querySelector('ul').firstChild.firstChild.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                                document.querySelector('ul').firstChild.firstChild.pause();
                             })
+                            .catch(error => {
+
+                            });
+                    }
+                    //if switch is true, an exsisting story is playing
+                    document.querySelector('ul').firstChild.firstChild.addEventListener('playing', () => {
+                        switchRef.child(key2).remove();
+                        switchRef.push({
+                            switch: true
                         })
-                        return document.querySelector('ul').firstChild.firstChild;
                     })
-                    .then(data => {
-                        data.addEventListener('ended', () => {
-                            //if switch is flase, an exsisting story is over
-                            switchRef.remove(
-                                err => {
-                                    if (err) {
-                                        console.warn(err)
-                                    } else {
-                                        switchRef.update({
-                                            switch: false
-                                        })
-                                    }
+                    return document.querySelector('ul').firstChild.firstChild;
+                })
+                .then(data => {
+                    data.addEventListener('ended', () => {
+                        //if switch is flase, an exsisting story is over
+                        switchRef.remove(
+                            err => {
+                                if (err) {
+                                    console.warn(err)
+                                } else {
+                                    switchRef.update({
+                                        switch: false
+                                    })
                                 }
-                            );
-                        })
+                            }
+                        );
                     })
-                    .catch(err => {
-                        console.warn(err + 'happened')
-                    })
-            })
-        }
+                })
+                .catch(err => {
+                    console.warn(err + 'happened')
+                })
+        })
+
 
         function createLi(blob) {
             let li = `<li><audio controls class='audio'>

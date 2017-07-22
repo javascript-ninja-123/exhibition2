@@ -49,7 +49,6 @@ var temporaryFB = soundRef.child('temporary');
 
 if (navigator.getUserMedia) {
 
-
     var constraints = { audio: true };
     var chunks = [];
     var onSuccess = function(stream) {
@@ -103,58 +102,61 @@ if (navigator.getUserMedia) {
                 firstChildEle.parentNode.removeChild(firstChildEle)
 
             }
-            var blob = new Blob(chunks, { 'type': 'audio/wav; codecs=opus' });
+            blob = new Blob(chunks, { 'type': 'audio/wav; codecs=opus' });
             chunks = [];
             var audioURL = window.URL.createObjectURL(blob);
             let audioFile = `<audio controls src='${audioURL}' class="audio"></audio>`
             soundClips.insertAdjacentHTML('afterbegin', audioFile)
             play.disabled = false;
-
-
         }
 
         mediaRecorder.ondataavailable = function(e) {
-                chunks.push(e.data);
-                // new time Date();
-                var d = new Date();
-                var year = d.getFullYear();
-                var month = d.getMonth();
-                var day = d.getDate();
-                var hour = d.getHours();
-                var min = d.getMinutes();
-                var sec = d.getSeconds();
-                time = `${year}-${month}-${day}-${hour}h-${min}m-${sec}sec`;
-                blob = e.data;
-                url = URL.createObjectURL(blob);
-                // create a file
-                file = new File([blob], `${time}.wav`, {
-                    lastModified: new Date(0),
-                    type: "overide/mimetype"
-                });
-                console.log(file)
-                storageRef = firebase.storage().ref('/sound/' + file.name);
-            }
-            //Click a save button
+            chunks.push(e.data);
+        }
+
+        function gettingTimeandBlob() {
+
+        }
+        //push data to firebase
+        function saveitToDatabase() {
+            var d = new Date();
+            var year = d.getFullYear();
+            var month = d.getMonth();
+            var day = d.getDate();
+            var hour = d.getHours();
+            var min = d.getMinutes();
+            var sec = d.getSeconds();
+            time = `${year}-${month}-${day}-${hour}h-${min}m-${sec}sec`;
+            url = window.URL.createObjectURL(blob);
+            // create a file
+            file = new File([blob], `${time}.wav`, {
+                lastModified: new Date(0),
+                type: "overide/mimetype"
+            });
+            let data = {
+                    time: time,
+                    blob: url,
+                }
+                // save it to the realtime database
+            let songRef = soundRef.child('songs')
+            songRef.push(data)
+                // save it to the storage 
+            let storageRef = firebase.storage().ref('/sound/' + file.name);
+            storageRef.put(file)
+        }
+        //Click a save button
         save.onclick = () => {
-            saveitToDatabase(time, url, 'sound/songs')
+
+            saveitToDatabase()
             addSpin(save)
             tl
                 .to(saveWrapper, 2, { x: 300, autoAlpha: 0, ease: Power1.easeOut })
             setTimeout(() => {
-                location.reload();
+                // location.reload();
             }, 3000)
         }
 
-        //push data to firebase
-        function saveitToDatabase(n, b, place) {
-            let firebaseRef = firebase.database().ref(place);
-            let data = {
-                time: `${n}`,
-                blob: `${b}`,
-            }
-            firebaseRef.push(data)
 
-        }
     }
 
     var onError = function(err) {
