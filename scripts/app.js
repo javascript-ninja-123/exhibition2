@@ -42,8 +42,8 @@ let addSpin = (ele) => {
 var storageDatabase = firebase.database().ref();
 var soundRef = storageDatabase.child('sound')
 var songRef = soundRef.child('songs')
-var switchRef = soundRef.child('switch');
-var temporaryFB = soundRef.child('temporary');
+    // var switchRef = soundRef.child('switch');
+    // var temporaryFB = soundRef.child('temporary');
 
 //main block for doing the audio recording
 
@@ -95,12 +95,10 @@ if (navigator.getUserMedia) {
 
         // right after stop button is clicked
         mediaRecorder.onstop = function(e) {
-
             let soundClipArray = Array.from(soundClips.children);
             if (soundClipArray.length > 0) {
                 let firstChildEle = soundClips.firstChild;
                 firstChildEle.parentNode.removeChild(firstChildEle)
-
             }
             blob = new Blob(chunks, { 'type': 'audio/wav; codecs=opus' });
             chunks = [];
@@ -127,7 +125,6 @@ if (navigator.getUserMedia) {
             var min = d.getMinutes();
             var sec = d.getSeconds();
             time = `${year}-${month}-${day}-${hour}h-${min}m-${sec}sec`;
-            url = window.URL.createObjectURL(blob);
             // create a file
             file = new File([blob], `${time}.wav`, {
                 lastModified: new Date(0),
@@ -135,18 +132,17 @@ if (navigator.getUserMedia) {
             });
             let data = {
                     time: time,
-                    blob: url,
+                    blob: audioURL,
                 }
                 // save it to the realtime database
-            let songRef = soundRef.child('songs')
             songRef.push(data)
-                // save it to the storage 
-            let storageRef = firebase.storage().ref('/sound/' + file.name);
-            storageRef.put(file)
+                .then(() => {
+                    // save it to the storage 
+                    storageRef.put(file)
+                })
         }
         //Click a save button
         save.onclick = () => {
-
             saveitToDatabase()
             addSpin(save)
             tl
